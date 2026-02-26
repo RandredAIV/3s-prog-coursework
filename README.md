@@ -4,7 +4,6 @@
 > Веб-приложение для просмотра каталога болидов Формулы-1,
 > оформления заявок на покупку и управления системой через административную панель.
 >
-> Репозиторий: https://github.com/Randred/CourseWork
 
 ---
 
@@ -483,7 +482,6 @@ Docker-изоляция          │ PostgreSQL доступна только п
 > Web application for browsing a Formula 1 car catalog,
 > submitting purchase requests and managing the system via an admin panel.
 >
-> Repository: https://github.com/Randred/CourseWork
 
 ---
 
