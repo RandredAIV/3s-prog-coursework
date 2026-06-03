@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Пользователи и заявки • Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-dark: #0d0d0d;
+            --f1-gray: #1a1a1a;
+            --bg-main: var(--f1-dark);
+            --bg-card: var(--f1-gray);
+            --accent: var(--f1-red);
+            --text-main: #ffffff;
+            --text-muted: #c7c7c7;
+            --border-subtle: rgba(255,255,255,0.15);
+        }
+
+        * { box-sizing:border-box; margin:0; padding:0; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* ---------- Header (одинаковый для всех страниц) ---------- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--f1-gray);
+            border-bottom: 2px solid var(--f1-red);
+            padding: 14px 26px;
+            border-radius: 0;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 120%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-text-main {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .brand-text-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--f1-red);
+            background: radial-gradient(circle at top left, #ff6b6b, var(--f1-red) 55%, #8b1b3d);
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 8px 20px rgba(225, 6, 0, 0.4);
+        }
+
+        .btn-logout:hover {
+            background: radial-gradient(circle at top left, #ff8d6c, #ff4b4b 55%, #8b1b3d);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 10px 25px rgba(225, 6, 0, 0.5);
+        }
+
+        /* ---------- Основные стили страницы ---------- */
+        h1 {
+            font-size:20px;
+            margin-bottom:14px;
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            margin-top:10px;
+        }
+
+        th, td {
+            border:1px solid var(--border-subtle);
+            padding:6px 8px;
+            font-size:13px;
+            vertical-align:top;
+        }
+
+        th {
+            background:#171717;
+        }
+
+        .user-cell {
+            font-weight:600;
+        }
+
+        .muted {
+            color:var(--text-muted);
+            font-size:12px;
+        }
+
+        .request-table {
+            width:100%;
+            border-collapse:collapse;
+            margin-top:4px;
+        }
+
+        .request-table th,
+        .request-table td {
+            border:1px solid rgba(255,255,255,0.12);
+            padding:4px 6px;
+            font-size:12px;
+        }
+
+        .badge-empty {
+            display:inline-block;
+            padding:3px 8px;
+            border-radius:999px;
+            border:1px solid rgba(255,255,255,0.3);
+            font-size:11px;
+            color:var(--text-muted);
+        }
+
+        a.req-link {
+            color:#ffd666;
+            text-decoration:none;
+            font-size:12px;
+        }
+
+        a.req-link:hover {
+            text-decoration:underline;
+        }
+
+        .user-link {
+            color: #61dafb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .user-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header (одинаковый для всех страниц) -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="logo-circle">
+                <img src="/images/f1-logo.png" alt="F1 Logo">
+            </div>
+            <div>
+                <div class="brand-text-main">AVRAMCHUK BOLID MOTORSPORT</div>
+                <div class="brand-text-sub">
+                    Панель администратора • Пользователи и заявки
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <nav class="nav-links">
+                <a href="/cars" class="nav-link">Каталог</a>
+                <a href="/cart" class="nav-link">Корзина</a>
+                
+                <!-- Кнопки администратора в навигации -->
+                <a th:href="@{/admin/users}"
+                   class="nav-link nav-link-active"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Пользователи и заявки
+                </a>
+                
+                <a th:href="@{/admin/cars/new}"
+                   class="nav-link"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Добавить болид
+                </a>
+            </nav>
+
+            <!-- Форма выхода -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">
+                    Выйти
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <h1>Пользователи и заявки на покупку болидов</h1>
+    <p class="muted">
+        Здесь администратор может увидеть список всех пользователей и их заявки
+        (болид, цена на момент заявки, ссылка на карточку болида).
+    </p>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width:260px;">Пользователь</th>
+            <th>Заявки</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td>
+                <!-- Кликабельное ФИО -->
+                <a class="user-link"
+                   th:href="@{|/admin/users/${user.id}|}"
+                   th:text="${
+                       (user.lastName != null ? user.lastName + ' ' : '') +
+                       (user.firstName != null ? user.firstName + ' ' : '') +
+                       (user.middleName != null ? user.middleName : 'Новый пользователь')
+                   }">
+                    Иванов Иван Иванович
+                </a>
+                <div class="muted" th:text="${user.email}">user@example.com</div>
+            </td>
+
+            <td>
+                <!-- Если у пользователя есть заявки -->
+                <div th:if="${#maps.containsKey(requestsByUser, user.id)}">
+                    <table class="request-table">
+                        <thead>
+                        <tr>
+                            <!-- УБРАНО: колонка ID -->
+                            <th>Болид</th>
+                            <th style="width:140px;">Цена, ₽</th>
+                            <th style="width:140px;">Ссылка</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="req : ${requestsByUser[user.id]}">
+                            <!-- УБРАНО: ячейка с req.id -->
+                            <td th:text="${req.carBrandSnapshot != null ? req.carBrandSnapshot : (req.car != null ? req.car.brand : '—')}">RB19</td>
+                            <td th:text="${req.priceSnapshot != null ? #numbers.formatDecimal(req.priceSnapshot,0,'WHITESPACE',0,'NONE') + ' ₽' : (req.car != null ? #numbers.formatDecimal(req.car.price,0,'WHITESPACE',0,'NONE') + ' ₽' : '—')}">
+                                1 000 000 000 ₽
+                            </td>
+                            <td>
+                                <a class="req-link"
+                                   th:if="${req.car != null}"
+                                   th:href="@{|/cars/${req.car.id}|}">
+                                    Открыть болид
+                                </a>
+                                <span th:if="${req.car == null}" class="muted">
+                                    Болид не найден
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Если заявок нет -->
+                <div th:if="${!#maps.containsKey(requestsByUser, user.id)}">
+                    <span class="badge-empty">Нет заявок</span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

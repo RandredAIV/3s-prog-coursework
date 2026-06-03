@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${isEdit != null and isEdit} ? 'Редактировать болид • AVRAMCHUK BOLID MOTORSPORT' : 'Добавить болид • Admin'">
+        Добавить болид • AVRAMCHUK BOLID MOTORSPORT
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+        .btn-admin {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: transparent;
+            color: #ffd666;
+            font-size: 12px;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+
+        .btn-admin:hover {
+            background: rgba(255, 214, 102, 0.12);
+        }
+
+        :root {
+            --f1-red: #e10600;
+            --f1-dark: #0d0d0d;
+            --f1-gray: #1a1a1a;
+            --bg-main: var(--f1-dark);
+            --bg-card: var(--f1-gray);
+            --accent: var(--f1-red);
+            --text-main: #ffffff;
+            --text-muted: #c7c7c7;
+            --border-subtle: rgba(255,255,255,0.08);
+            --radius-xl: 22px;
+            --shadow-soft: 0 18px 45px rgba(0,0,0,0.8);
+        }
+
+        * { box-sizing:border-box; margin:0; padding:0; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* ---------- Header ---------- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--f1-gray);
+            border-bottom: 2px solid var(--f1-red);
+            padding: 14px 26px;
+            border-radius: 0;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 120%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-text-main {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .brand-text-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--f1-red);
+            background: radial-gradient(circle at top left, #ff6b6b, var(--f1-red) 55%, #8b1b3d);
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 8px 20px rgba(225, 6, 0, 0.4);
+        }
+
+        .btn-logout:hover {
+            background: radial-gradient(circle at top left, #ff8d6c, #ff4b4b 55%, #8b1b3d);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 10px 25px rgba(225, 6, 0, 0.5);
+        }
+
+        .btn-ghost {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            font-size: 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 12px;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* ---------- Form Styles ---------- */
+        .form-container {
+            background: rgba(5, 10, 26, 0.9);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            border-left: 4px solid var(--f1-red);
+            padding-left: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-main);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--f1-red);
+            box-shadow: 0 0 0 2px rgba(225, 6, 0, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--f1-red);
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .btn-primary {
+            padding: 10px 24px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            background: var(--f1-red);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(225, 6, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #ff372f;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(225, 6, 0, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 10px 24px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: var(--text-main);
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 0, 0.15);
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            color: #00ff7b;
+        }
+
+        .alert-error {
+            background: rgba(255, 75, 75, 0.15);
+            border: 1px solid rgba(255, 75, 75, 0.4);
+            color: #ff8a8a;
+        }
+
+        .info-box {
+            background: rgba(255, 214, 102, 0.1);
+            border: 1px solid rgba(255, 214, 102, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: #ffd666;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-box ul {
+            color: var(--text-muted);
+            padding-left: 16px;
+            line-height: 1.5;
+            font-size: 13px;
+        }
+
+        .info-box li {
+            margin-bottom: 6px;
+        }
+
+        /* Стили для ошибок валидации */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 11px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .error-message::before {
+            content: "⚠";
+            font-size: 12px;
+        }
+
+        .form-input.error, .form-select.error, .form-textarea.error {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+        }
+
+        .field-hint {
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .page {
+                padding: 16px 12px 30px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="logo-circle">
+                <img src="/images/f1-logo.png" alt="F1 Logo">
+            </div>
+            <div>
+                <div class="brand-text-main">AVRAMCHUK BOLID MOTORSPORT</div>
+                <div class="brand-text-sub">
+                    <span th:if="${isEdit != null and isEdit}">Панель администратора • Редактировать болид</span>
+                    <span th:if="${isEdit == null or !isEdit}">Панель администратора • Добавить болид</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <nav class="nav-links">
+                <a href="/cars" class="nav-link">Каталог</a>
+                <a href="/cart" class="nav-link">Корзина</a>
+                
+                <!-- Кнопки администратора в навигации -->
+                <a th:href="@{/admin/users}"
+                   class="nav-link"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Пользователи и заявки
+                </a>
+                
+                <a th:href="@{/admin/cars/new}"
+                   class="nav-link nav-link-active"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Добавить болид
+                </a>
+            </nav>
+
+            <!-- Форма выхода -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">
+                    Выйти
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Сообщения об успехе/ошибке -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="form-container">
+        <div class="form-title">
+            <span th:if="${isEdit != null and isEdit}">Редактировать болид</span>
+            <span th:if="${isEdit == null or !isEdit}">Добавить новый болид</span>
+        </div>
+        
+        <!-- Форма -->
+        <form th:action="${(isEdit != null and isEdit) ? '/admin/cars/' + car.id + '/edit' : '/admin/cars/new'}" 
+              th:object="${car}" method="post" class="form-grid">
+            
+            <!-- Основная информация -->
+            <div class="form-group">
+                <label class="form-label">Название болида *</label>
+                <input type="text" class="form-input" th:field="*{brand}" 
+                       th:classappend="${#fields.hasErrors('brand')} ? 'error' : ''"
+                       placeholder="RB19, W14, SF-23..." required>
+                <div th:if="${#fields.hasErrors('brand')}" class="error-message">
+                    <span th:errors="*{brand}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Цена (₽) *</label>
+                <input type="number" class="form-input" th:field="*{price}" 
+                       th:classappend="${#fields.hasErrors('price')} ? 'error' : ''"
+                       step="0.01" min="0" max="100000000000" placeholder="1000000000" required>
+                <div th:if="${#fields.hasErrors('price')}" class="error-message">
+                    <span th:errors="*{price}"></span>
+                </div>
+                <div class="field-hint">Максимум: 100 000 000 000 ₽</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Пробег (км) *</label>
+                <input type="number" class="form-input" th:field="*{mileageKm}" 
+                       th:classappend="${#fields.hasErrors('mileageKm')} ? 'error' : ''"
+                       min="0" max="1000000" placeholder="1200" required>
+                <div th:if="${#fields.hasErrors('mileageKm')}" class="error-message">
+                    <span th:errors="*{mileageKm}"></span>
+                </div>
+                <div class="field-hint">Максимум: 1 000 000 км</div>
+            </div>
+<!--
+            <div class="form-group">
+                <label class="form-label">Дата выпуска *</label>
+                <input type="date" class="form-input" th:field="*{releaseDate}" 
+                    th:classappend="${#fields.hasErrors('releaseDate')} ? 'error' : ''" required>
+                <div th:if="${#fields.hasErrors('releaseDate')}" class="error-message">
+                    <span th:errors="*{releaseDate}"></span>
+                </div>
+                <div class="field-hint">Год даты выпуска должен совпадать с выбранным сезоном</div>
+            </div> -->
+
+            <div class="form-group">
+                <label class="form-label">Команда *</label>
+                <select class="form-select" th:field="*{team}" 
+                        th:classappend="${#fields.hasErrors('team')} ? 'error' : ''" required>
+                    <option value="">Выберите команду</option>
+                    <option th:each="team : ${teams}" 
+                            th:value="${team.id}"
+                            th:text="${team.name}">
+                    </option>
+                </select>
+                <div th:if="${#fields.hasErrors('team')}" class="error-message">
+                    <span th:errors="*{team}"></span>
+                </div>
+            </div>
+
+            <!-- Статистика F1 -->
+            <div class="form-group">
+                <label class="form-label">Сезон *</label>
+                <select class="form-select" th:field="*{seasonYear}" 
+                        th:classappend="${#fields.hasErrors('seasonYear')} ? 'error' : ''" required>
+                    <option value="">Выберите сезон</option>
+                    <option th:each="year : ${#numbers.sequence(2020, 2024)}" 
+                            th:value="${year}"
+                            th:text="${year}">
+                    </option>
+                </select>
+                <div th:if="${#fields.hasErrors('seasonYear')}" class="error-message">
+                    <span th:errors="*{seasonYear}"></span>
+                </div>
+                <!--<div class="field-hint">Год сезона должен совпадать с годом даты выпуска</div>-->
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Количество побед</label>
+                <input type="number" class="form-input" th:field="*{wins}" 
+                       th:classappend="${#fields.hasErrors('wins')} ? 'error' : ''"
+                       min="0" max="50" placeholder="3">
+                <div th:if="${#fields.hasErrors('wins')}" class="error-message">
+                    <span th:errors="*{wins}"></span>
+                </div>
+                <div class="field-hint">Максимум: 50 побед</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Количество очков</label>
+                <input type="number" class="form-input" th:field="*{points}" 
+                       th:classappend="${#fields.hasErrors('points')} ? 'error' : ''"
+                       min="0" max="1000" placeholder="280">
+                <div th:if="${#fields.hasErrors('points')}" class="error-message">
+                    <span th:errors="*{points}"></span>
+                </div>
+                <div class="field-hint">Максимум: 1000 очков</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Лучший результат</label>
+                <input type="text" class="form-input" th:field="*{bestResult}" 
+                    th:classappend="${#fields.hasErrors('bestResult')} ? 'error' : ''"
+                    placeholder="1-место, 2-место..."
+                    pattern="([1-9]|[1-4][0-9]|50)(-)?место"
+                    title="Формат: X место, где X от 1 до 50">
+                <div th:if="${#fields.hasErrors('bestResult')}" class="error-message">
+                    <span th:errors="*{bestResult}"></span>
+                </div>
+                <div class="field-hint">Формат: "X место", где X от 1 до 30. Пример: "1 место", "15 место"</div>
+            </div>
+
+            <!-- Дополнительные настройки -->
+            <div class="form-group full-width">
+                <label class="form-label">Описание болида</label>
+                <textarea class="form-textarea" th:field="*{description}" 
+                          th:classappend="${#fields.hasErrors('description')} ? 'error' : ''"
+                          placeholder="Технические характеристики, особенности болида..."></textarea>
+                <div th:if="${#fields.hasErrors('description')}" class="error-message">
+                    <span th:errors="*{description}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" th:field="*{available}" id="available">
+                    <label class="form-label" for="available">Доступен для покупки</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" th:field="*{constructorsChampion}" id="champion">
+                    <label class="form-label" for="champion">Чемпионский болид</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" th:field="*{hidden}" id="hidden">
+                    <label class="form-label" for="hidden" style="color: #ff6b6b;">
+                        Скрытый тестовый болид (видят только админы)
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a th:href="${(isEdit != null and isEdit) ? '/cars/' + car.id : '/cars'}" class="btn-secondary">
+                    Отмена
+                </a>
+                <button type="submit" class="btn-primary">
+                    <span th:if="${isEdit != null and isEdit}">Сохранить изменения</span>
+                    <span th:if="${isEdit == null or !isEdit}">Добавить болид</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-box" th:if="${isEdit == null or !isEdit}">
+        <h4>Информация о добавлении</h4>
+        <ul>
+            <li>После добавления болид появится в каталоге как новая плитка</li>
+            <li>Для добавления фотографии поместите файл с названием <strong>ID.jpg</strong> в папку <code>/images/cars/</code></li>
+            <li>ID болида будет присвоен автоматически после сохранения</li>
+            <li>Обязательные поля отмечены звёздочкой (*)</li>
+            <li>Все числовые поля имеют ограничения для реалистичных значений F1</li>
+        </ul>
+    </div>
+
+    <div class="info-box" th:if="${isEdit != null and isEdit}">
+        <h4>Информация о редактировании</h4>
+        <ul>
+            <li>Изменения сохранятся сразу после нажатия кнопки "Сохранить изменения"</li>
+            <li>Для обновления фотографии замените файл с названием <strong th:text="${car.id}">ID</strong>.jpg в папке <code>/images/cars/</code></li>
+            <li>Обязательные поля отмечены звёздочкой (*)</li>
+            <li>Все числовые поля имеют ограничения для реалистичных значений F1</li>
+        </ul>
+    </div>
+
+</div>
+</body>
+</html>

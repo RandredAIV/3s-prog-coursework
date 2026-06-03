@@ -1,0 +1,8 @@
+com/coursework/autosalon/io/BinaryCarFile.class
+com/coursework/autosalon/repository/CarFileRepository.class
+com/coursework/autosalon/io/BinaryCarShortFile.class
+com/coursework/autosalon/model/CarRecord.class
+com/coursework/autosalon/App.class
+com/coursework/autosalon/service/AutosalonService.class
+com/coursework/autosalon/model/CarShortRecord.class
+com/coursework/autosalon/repository/CarShortFileRepository.class

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Регистрация — AVRAMCHUK BOLID MOTORSPORT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <style>
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-window {
+            background: #141414;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px 20px 16px;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        :root {
+            --f1-red: #e10600;
+            --f1-dark: #0d0d0d;
+            --f1-gray: #1a1a1a;
+            --f1-lightgray: #bfbfbf;
+
+            --bg-main: var(--f1-dark);
+            --bg-card: var(--f1-gray);
+
+            --accent: var(--f1-red);
+            --accent-soft: rgba(225, 6, 0, 0.12);
+
+            --text-main: #ffffff;
+            --text-muted: #c7c7c7;
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+
+            --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--f1-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* ---------- Header ---------- */
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            margin: -24px -16px 32px;
+            background: #111111;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 120%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-text-main {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .brand-text-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+        .btn-primary {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--f1-red);
+            box-shadow: 0 0 15px rgba(225, 6, 0, 0.55);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #ff372f;
+            box-shadow: 0 0 18px rgba(225, 6, 0, 0.75);
+        }
+
+        /* ---------- AUTH ---------- */
+
+        .auth-wrapper {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(5, 10, 26, 0.96);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+            padding: 22px 22px 20px;
+        }
+
+        .auth-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .auth-alert {
+            padding: 9px 11px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .auth-alert-error {
+            background: rgba(225, 6, 0, 0.16);
+            border: 1px solid rgba(225, 6, 0, 0.7);
+            color: #ffe5e5;
+        }
+
+        .auth-alert-success {
+            background: rgba(0, 200, 120, 0.14);
+            border: 1px solid rgba(0, 220, 140, 0.7);
+            color: #d1fae5;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group input[type="date"],
+        .form-group input[type="tel"] {
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: #050817;
+            color: var(--text-main);
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .form-group input[type="text"]::placeholder,
+        .form-group input[type="email"]::placeholder,
+        .form-group input[type="password"]::placeholder,
+        .form-group input[type="tel"]::placeholder {
+            color: #7b7b7b;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group input[type="password"]:focus,
+        .form-group input[type="date"]:focus,
+        .form-group input[type="tel"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(225, 6, 0, 0.7);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .auth-switch {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .auth-switch a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* --------- gender radio buttons --------- */
+
+        .gender-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-option {
+            flex: 1;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: #050817;
+            padding: 6px 10px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .gender-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .gender-option:hover {
+            border-color: var(--accent);
+        }
+
+        /* ДОБАВЛЕНО: Стили для ошибок валидации */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .error-message::before {
+            content: "⚠";
+            font-size: 0.8rem;
+        }
+
+        .form-group input.error {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.5);
+        }
+
+        .gender-option.error {
+            border-color: #ff6b6b;
+        }
+
+        .field-hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .page {
+                padding: 18px 12px 30px;
+            }
+
+            .auth-card {
+                padding: 18px 16px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="logo-circle">
+                <img src="/images/f1-logo.png" alt="F1 Logo">
+            </div>
+            <div>
+                <div class="brand-text-main">AVRAMCHUK BOLID MOTORSPORT</div>
+                <div class="brand-text-sub">Коллекция легендарных болидов Формулы-1</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Главная</a>
+                <a href="/login" class="nav-link">Вход</a>
+                <a href="/register" class="nav-link nav-link-active">Регистрация</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Register form -->
+    <section class="auth-wrapper">
+        <div class="auth-card">
+            <h1 class="auth-title">Регистрация</h1>
+            <p class="auth-subtitle">
+                Создайте аккаунт, чтобы управлять заказами и сохранять избранные болиды.
+            </p>
+
+            <!-- Общая ошибка (e-mail занят и т.п.) -->
+            <div th:if="${error}" class="auth-alert auth-alert-error">
+                <span th:text="${error}">Произошла ошибка при регистрации.</span>
+            </div>
+
+            <form th:action="@{/register}"
+                  th:object="${form}"
+                  method="post"
+                  class="auth-form">
+
+                <!-- CSRF ТОКЕН (ВАЖНО!) -->
+                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+
+                <!-- Фамилия -->
+                <div class="form-group">
+                    <label for="lastName">Фамилия *</label>
+                    <input id="lastName"
+                           type="text"
+                           th:field="*{lastName}"
+                           th:classappend="${#fields.hasErrors('lastName')} ? 'error' : ''"
+                           placeholder="Иванов"
+                           required
+                           pattern="[A-Za-zА-Яа-яёЁ\\- ]+">
+                    <div th:if="${#fields.hasErrors('lastName')}" class="error-message">
+                        <span th:errors="*{lastName}"></span>
+                    </div>
+                    <div class="field-hint">Только буквы и дефис</div>
+                </div>
+
+                <!-- Имя -->
+                <div class="form-group">
+                    <label for="firstName">Имя *</label>
+                    <input id="firstName"
+                           type="text"
+                           th:field="*{firstName}"
+                           th:classappend="${#fields.hasErrors('firstName')} ? 'error' : ''"
+                           placeholder="Иван"
+                           required
+                           pattern="[A-Za-zА-Яа-яёЁ\\- ]+">
+                    <div th:if="${#fields.hasErrors('firstName')}" class="error-message">
+                        <span th:errors="*{firstName}"></span>
+                    </div>
+                    <div class="field-hint">Только буквы и дефис</div>
+                </div>
+
+                <!-- Отчество -->
+                <div class="form-group">
+                    <label for="middleName">Отчество</label>
+                    <input id="middleName"
+                           type="text"
+                           th:field="*{middleName}"
+                           th:classappend="${#fields.hasErrors('middleName')} ? 'error' : ''"
+                           placeholder="Иванович"
+                           pattern="[A-Za-zА-Яа-яёЁ\\- ]*">
+                    <div th:if="${#fields.hasErrors('middleName')}" class="error-message">
+                        <span th:errors="*{middleName}"></span>
+                    </div>
+                    <div class="field-hint">Только буквы и дефис (необязательно)</div>
+                </div>
+
+                <!-- Дата рождения -->
+                <div class="form-group">
+                    <label for="birthDate">Дата рождения *</label>
+                    <input id="birthDate"
+                           type="date"
+                           th:field="*{birthDate}"
+                           th:classappend="${#fields.hasErrors('birthDate')} ? 'error' : ''"
+                           required>
+                    <div th:if="${#fields.hasErrors('birthDate')}" class="error-message">
+                        <span th:errors="*{birthDate}"></span>
+                    </div>
+                    <div class="field-hint">Год рождения от 1900 до 2025</div>
+                </div>
+
+                <!-- Телефон -->
+                <div class="form-group">
+                    <label for="phone">Телефон *</label>
+                    <input id="phone"
+                           type="tel"
+                           th:field="*{phone}"
+                           th:classappend="${#fields.hasErrors('phone')} ? 'error' : ''"
+                           placeholder="+79991234567"
+                           required
+                           pattern="\+7\d{3}\d{3}\d{2}\d{2}">
+                    <div th:if="${#fields.hasErrors('phone')}" class="error-message">
+                        <span th:errors="*{phone}"></span>
+                    </div>
+                    <div class="field-hint">Формат: +7XXXXXXXXXX</div>
+                </div>
+
+                <!-- Пол -->
+                <div class="form-group">
+                    <label>Пол *</label>
+                    <div class="gender-group">
+                        <label class="gender-option" th:classappend="${#fields.hasErrors('gender')} ? 'error' : ''">
+                            <input type="radio"
+                                   th:field="*{gender}"
+                                   value="MALE">
+                            <span>Мужской</span>
+                        </label>
+                        <label class="gender-option" th:classappend="${#fields.hasErrors('gender')} ? 'error' : ''">
+                            <input type="radio"
+                                   th:field="*{gender}"
+                                   value="FEMALE">
+                            <span>Женский</span>
+                        </label>
+                    </div>
+                    <div th:if="${#fields.hasErrors('gender')}" class="error-message">
+                        <span th:errors="*{gender}"></span>
+                    </div>
+                </div>
+
+                <!-- E-mail -->
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input id="email"
+                           type="email"
+                           th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')} ? 'error' : ''"
+                           placeholder="you@example.com"
+                           required>
+                    <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                        <span th:errors="*{email}"></span>
+                    </div>
+                </div>
+
+                <!-- Пароль -->
+                <div class="form-group">
+                    <label for="password">Пароль *</label>
+                    <input id="password"
+                           type="password"
+                           th:field="*{password}"
+                           th:classappend="${#fields.hasErrors('password')} ? 'error' : ''"
+                           placeholder="Придумайте надёжный пароль"
+                           required
+                           minlength="6">
+                    <div th:if="${#fields.hasErrors('password')}" class="error-message">
+                        <span th:errors="*{password}"></span>
+                    </div>
+                    <div class="field-hint">Минимум 6 символов</div>
+                </div>
+
+                <!-- Подтверждение пароля -->
+                <div class="form-group">
+                    <label for="confirmPassword">Подтверждение пароля *</label>
+                    <input id="confirmPassword"
+                           type="password"
+                           th:field="*{confirmPassword}"
+                           th:classappend="${#fields.hasErrors('confirmPassword')} ? 'error' : ''"
+                           placeholder="Повторите пароль"
+                           required
+                           minlength="6">
+                    <div th:if="${#fields.hasErrors('confirmPassword')}" class="error-message">
+                        <span th:errors="*{confirmPassword}"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">
+                    Зарегистрироваться
+                </button>
+
+                <p class="auth-switch">
+                    Уже есть аккаунт?
+                    <a th:href="@{/login}">Войти</a>
+                </p>
+            </form>
+
+        </div>
+    </section>
+</div>
+</body>
+</html>
