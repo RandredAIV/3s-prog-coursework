@@ -1,0 +1,8 @@
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/model/CarRecord.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/repository/CarFileRepository.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/repository/CarShortFileRepository.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/model/CarShortRecord.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/App.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/service/AutosalonService.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/io/BinaryCarFile.java
+/home/randred/Desktop/CourseWork/autosalon-console/src/main/java/com/coursework/autosalon/io/BinaryCarShortFile.java

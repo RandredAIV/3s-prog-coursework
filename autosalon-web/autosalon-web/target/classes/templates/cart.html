@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Корзина • AVRAMCHUK BOLID MOTORSPORT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-dark: #0d0d0d;
+            --f1-gray: #1a1a1a;
+            --bg-main: var(--f1-dark);
+            --bg-card: var(--f1-gray);
+            --accent: var(--f1-red);
+            --text-main: #ffffff;
+            --text-muted: #c7c7c7;
+            --border-subtle: rgba(255,255,255,0.08);
+            --radius-xl: 22px;
+            --shadow-soft: 0 18px 45px rgba(0,0,0,0.8);
+        }
+
+        * { box-sizing:border-box; margin:0; padding:0; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* ---------- Header (одинаковый для всех страниц) ---------- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--f1-gray);
+            border-bottom: 2px solid var(--f1-red);
+            padding: 14px 26px;
+            border-radius: 0;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 120%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-text-main {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .brand-text-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--f1-red);
+            background: radial-gradient(circle at top left, #ff6b6b, var(--f1-red) 55%, #8b1b3d);
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 8px 20px rgba(225, 6, 0, 0.4);
+        }
+
+        .btn-logout:hover {
+            background: radial-gradient(circle at top left, #ff8d6c, #ff4b4b 55%, #8b1b3d);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 10px 25px rgba(225, 6, 0, 0.5);
+        }
+
+        /* ---------- Основные стили корзины ---------- */
+        .layout {
+            display:grid;
+            grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+            gap:20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border:1px solid var(--border-subtle);
+            box-shadow:var(--shadow-soft);
+            padding:18px 18px 20px;
+        }
+
+        .cart-title {
+            font-size:20px;
+            font-weight:700;
+            margin-bottom:12px;
+        }
+
+        .cart-empty {
+            font-size:14px;
+            color:var(--text-muted);
+            margin-bottom:16px;
+        }
+
+        .cart-list {
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            margin-top:10px;
+        }
+
+        .cart-item {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            padding:10px 12px;
+            border-radius:14px;
+            background:#141414;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        .cart-item-main {
+            display:flex;
+            flex-direction:column;
+        }
+
+        .cart-item-title {
+            font-size:15px;
+            font-weight:600;
+        }
+
+        .cart-item-sub {
+            font-size:12px;
+            color:var(--text-muted);
+            margin-top:3px;
+        }
+
+        .cart-item-price {
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .btn-remove {
+            border:none;
+            background:transparent;
+            color:#ff5555;
+            font-size:12px;
+            cursor:pointer;
+        }
+
+        .summary-title {
+            font-size:16px;
+            font-weight:700;
+            margin-bottom:8px;
+        }
+
+        .summary-row {
+            display:flex;
+            justify-content:space-between;
+            font-size:14px;
+            margin-bottom:6px;
+        }
+
+        .summary-total {
+            font-size:18px;
+            font-weight:700;
+            margin-top:8px;
+        }
+
+        .btn-primary, .btn-secondary {
+            width:100%;
+            border:none;
+            border-radius:999px;
+            font-size:14px;
+            font-weight:600;
+            padding:9px 16px;
+            cursor:pointer;
+            margin-top:10px;
+        }
+
+        .btn-primary {
+            background:var(--accent);
+            color:#ffffff;
+        }
+
+        .btn-primary:hover { filter:brightness(1.08); }
+
+        .btn-secondary {
+            background:#222222;
+            color:#ffffff;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-success {
+            background: #1f7a1f;
+            color: #fff;
+        }
+
+        .toast-error {
+            background: #a40000;
+            color: #fff;
+        }
+
+        .toast-info {
+            background: #333;
+            color: #fff;
+        }
+
+        .toast-close {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover { background:#292929; }
+
+        @media (max-width:900px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header (одинаковый для всех страниц) -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="logo-circle">
+                <img src="/images/f1-logo.png" alt="F1 Logo">
+            </div>
+            <div>
+                <div class="brand-text-main">AVRAMCHUK BOLID MOTORSPORT</div>
+                <div class="brand-text-sub">
+                    Корзина
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <nav class="nav-links">
+                <a href="/cars" class="nav-link">Каталог</a>
+                <a href="/cart" class="nav-link nav-link-active">Корзина</a>
+                
+                <!-- Личный кабинет для авторизованных -->
+                <a href="/profile"
+                class="nav-link"
+                sec:authorize="isAuthenticated()">
+                    Личный кабинет
+                </a>
+
+                <!-- Кнопки администратора в навигации -->
+                <a th:href="@{/admin/users}"
+                   class="nav-link"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Пользователи и заявки
+                </a>
+                
+                <a th:href="@{/admin/cars/new}"
+                   class="nav-link"
+                   sec:authorize="hasRole('ADMIN')"
+                   style="color: #ffd666;">
+                    Добавить болид
+                </a>
+            </nav>
+
+            <!-- Форма выхода -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">
+                    Выйти
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- Левая колонка: список болидов -->
+        <section class="card">
+            <div class="cart-title">Ваши болиды</div>
+
+            <div th:if="${cart.empty}">
+                <p class="cart-empty">
+                    Корзина пуста. Добавьте болиды из каталога, чтобы оформить заявку.
+                </p>
+                <a href="/cars" class="btn-secondary" style="display:inline-block;text-align:center;">
+                    Продолжить покупки
+                </a>
+            </div>
+
+            <div th:if="${!cart.empty}" class="cart-list">
+                <div th:each="item : ${cart.items}" class="cart-item">
+                    <div class="cart-item-main">
+                        <div class="cart-item-title"
+                             th:text="${item.car.brand}">
+                            Ferrari SF-23
+                        </div>
+                        <div class="cart-item-sub">
+                            Сезон
+                            <span th:text="${item.car.seasonYear}">2024</span>,
+                            количество:
+                            <span th:text="${item.quantity}">1</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align:right;">
+                        <div class="cart-item-price"
+                             th:text="${#numbers.formatDecimal(item.totalPrice,0,'WHITESPACE',0,'NONE')} + ' ₽'">
+                            1 000 000 000 ₽
+                        </div>
+
+                        <form th:action="@{/cart/remove/{id}(id=${item.car.id})}"
+                              method="post" style="margin-top:4px;">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" class="btn-remove">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${successMessage}" class="toast toast-success">
+                <span th:text="${successMessage}">Заявка отправлена.</span>
+                <button type="button" class="toast-close" onclick="this.parentElement.style.display='none'">×</button>
+            </div>
+
+            <div th:if="${errorMessage}" class="toast toast-error">
+                <span th:text="${errorMessage}">Ошибка.</span>
+                <button type="button" class="toast-close" onclick="this.parentElement.style.display='none'">×</button>
+            </div>
+
+            <div th:if="${infoMessage}" class="toast toast-info">
+                <span th:text="${infoMessage}">Информация.</span>
+                <button type="button" class="toast-close" onclick="this.parentElement.style.display='none'">×</button>
+            </div>
+
+        </section>
+
+        <!-- Правая колонка: итоги -->
+        <aside class="card" th:if="${!cart.empty}">
+            <div class="summary-title">Итого</div>
+
+            <div class="summary-row">
+                <span>Болидов в заказе</span>
+                <span th:text="${cart.totalCount}">1</span>
+            </div>
+
+            <div class="summary-total"
+                th:text="${#numbers.formatDecimal(cart.totalPrice,0,'WHITESPACE',0,'NONE')} + ' ₽'">
+                1 000 000 000 ₽
+            </div>
+
+            <form th:action="@{/cart/order}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn-primary">
+                    Оформить заявку
+                </button>
+            </form>
+
+            <form th:action="@{/cart/clear}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="btn-secondary">
+                    Очистить корзину
+                </button>
+            </form>
+
+            <a href="/cars" class="btn-secondary" style="display:block;text-align:center;">
+                Продолжить покупки
+            </a>
+        </aside>
+    </main>
+</div>
+</body>
+</html>

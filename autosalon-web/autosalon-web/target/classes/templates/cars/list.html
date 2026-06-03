@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>AVRAMCHUK BOLID MOTORSPORT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <style>
+        :root {
+            /* Основные фирменные цвета F1 */
+            --f1-red: #e10600;
+            --f1-dark: #0d0d0d;
+            --f1-gray: #1a1a1a;
+            --f1-lightgray: #bfbfbf;
+
+            /* Используем их в теме */
+            --bg-main: var(--f1-dark);
+            --bg-card: var(--f1-gray);
+            --bg-card-hover: #262626;
+
+            --accent: var(--f1-red);
+            --accent-soft: rgba(225, 6, 0, 0.12);
+
+            --text-main: #ffffff;
+            --text-muted: #c7c7c7;
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+
+            --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--f1-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        /* ---------- Header ---------- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--f1-gray);
+            border-bottom: 2px solid var(--f1-red);
+            padding: 14px 26px;
+            border-radius: 0;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-circle img {
+            width: 120%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-text-main {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .brand-text-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+        }
+
+        .nav-link-active {
+            color: #ffffff;
+            border-bottom-color: var(--accent);
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--f1-red);
+            background: radial-gradient(circle at top left, #ff6b6b, var(--f1-red) 55%, #8b1b3d);
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 8px 20px rgba(225, 6, 0, 0.4);
+        }
+
+        .btn-logout:hover {
+            background: radial-gradient(circle at top left, #ff8d6c, #ff4b4b 55%, #8b1b3d);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 10px 25px rgba(225, 6, 0, 0.5);
+        }
+
+        /* ---------- Filter ---------- */
+        .filter-bar {
+            background: rgba(5, 10, 26, 0.9);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-soft);
+            padding: 18px 20px;
+            margin-bottom: 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            letter-spacing: 0.26em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .season-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .season-tab {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), rgba(11, 16, 40, 0.95));
+            color: var(--text-main);
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .season-tab span {
+            opacity: 0.85;
+        }
+
+        .season-tab-active {
+            border-color: var(--f1-red);
+            background: radial-gradient(circle at top left, #ff6b6b, var(--f1-red) 55%, #8b1b3d);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 16px 30px rgba(225, 6, 0, 0.45);
+        }
+
+        .season-tab-active span {
+            opacity: 1;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .sort-row {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            align-items: center;
+        }
+
+        .sort-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-muted);
+        }
+
+        .sort-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .extra-filters {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            align-items: center;
+        }
+
+        /* Стили для числовых полей ввода цены с красными стрелочками */
+        .price-filter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .price-filter input[type="number"] {
+            width: 80px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: #050817;
+            color: var(--text-main);
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .price-filter input[type="number"]:focus {
+            border-color: var(--f1-red);
+            box-shadow: 0 0 0 2px rgba(225, 6, 0, 0.2);
+            outline: none;
+        }
+
+        /* Красные стрелочки в числовых полях */
+        .price-filter input[type="number"]::-webkit-outer-spin-button,
+        .price-filter input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .price-filter input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Для браузеров которые поддерживают стилизацию стрелочек */
+        .price-filter input[type="number"]::-webkit-inner-spin-button {
+            background-color: var(--f1-red);
+            border-radius: 4px;
+            margin: 2px;
+        }
+
+        .price-filter input[type="number"]::-webkit-outer-spin-button {
+            background-color: var(--f1-red);
+            border-radius: 4px;
+            margin: 2px;
+        }
+
+        /* Стили для тестовых болидов */
+        .test-cars-section {
+            margin-bottom: 32px;
+        }
+
+        .test-cars-section .car-card:hover {
+            border: 2px solid rgba(255, 107, 107, 0.6);
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.2),
+                        var(--shadow-soft);
+        }
+
+        /* Красные чекбоксы для фильтра наличия */
+        .availability-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .availability-filter label {
+            font-size: 12px;
+            color: var(--text-main);
+        }
+
+        .availability-filter input {
+            margin-right: 4px;
+        }
+
+        .availability-filter input[type="checkbox"] {
+            accent-color: var(--f1-red);
+        }
+
+        .availability-filter input[type="checkbox"]:checked + span {
+            color: var(--f1-red);
+            font-weight: 600;
+        }
+
+        .availability-filter label:has(input[type="checkbox"]:checked) {
+            color: var(--f1-red);
+        }
+
+        /* Фильтры производителей */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-manufacturers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: radial-gradient(circle at top left,
+            rgba(255, 255, 255, 0.04),
+            rgba(11, 16, 40, 0.95));
+            font-size: 12px;
+            color: var(--text-main);
+        }
+
+        .filter-chip input[type="checkbox"] {
+            accent-color: var(--f1-red);
+        }
+
+        .filter-chip input[type="checkbox"]:checked + span {
+            color: var(--f1-red);
+            font-weight: 600;
+        }
+
+        .filter-chip:has(input[type="checkbox"]:checked) {
+            border-color: var(--f1-red);
+            background: radial-gradient(circle at top left,
+                    rgba(225, 6, 0, 0.1),
+                    rgba(11, 16, 40, 0.95));
+        }
+
+        .btn-primary {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--f1-red);
+            box-shadow: 0 0 15px rgba(225, 6, 0, 0.55);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #ff372f;
+            box-shadow: 0 0 18px rgba(225, 6, 0, 0.75);
+        }
+
+        .btn-secondary {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(5, 10, 26, 0.9);
+            color: var(--text-main);
+            font-size: 12px;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(20, 26, 56, 0.95);
+        }
+
+        /* ---------- Cards grid ---------- */
+        .cards-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd666; /* Золотой цвет */
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #ffd666; /* Золотая полоска слева */
+            padding-left: 10px;
+        }
+
+        .cards-section-title span {
+            color: #ffd666; /* Золотой цвет для текста */
+        }
+        .champions-title span {
+            color: #ffd666; /* Золотой цвет для текста */
+
+        }
+
+        /* Убираем красный прямоугольник (champions-badge) для обычных сезонов */
+        .cards-section-title .champions-badge {
+            display: inline-block; /* Показываем плашки */
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 214, 102, 0.95);
+            background: rgba(255, 214, 102, 0.15);
+            color: #ffd666;
+        }
+        .champions-title .champions-badge {
+            display: inline-block; /* Показываем плашки */
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 214, 102, 0.95);
+            background: rgba(255, 214, 102, 0.15);
+            color: #ffd666;
+        }
+
+        /* Оставляем бейдж только для настоящих чемпионских секций */
+        .champions-section .champions-badge {
+            display: inline-block; /* Показываем только в чемпионской секции */
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 214, 102, 0.95);
+            background: rgba(255, 214, 102, 0.15);
+            color: #ffd666;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .car-card[data-available="true"] {
+            border: 2px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1),
+                        var(--shadow-soft);
+        }
+
+        .car-card[data-available="false"] {
+            border: 2px solid rgba(225, 6, 0, 0.3);
+            box-shadow: 0 0 20px rgba(225, 6, 0, 0.1),
+                        var(--shadow-soft);
+        }
+
+        /* Усилим эффект при наведении */
+        .car-card[data-available="true"]:hover {
+            border: 2px solid rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2),
+                        var(--shadow-soft);
+        }
+
+        .car-card[data-available="false"]:hover {
+            border: 2px solid rgba(225, 6, 0, 0.6);
+            box-shadow: 0 0 30px rgba(225, 6, 0, 0.2),
+                        var(--shadow-soft);
+        }
+
+        .car-card {
+            background: var(--f1-gray);
+            border-radius: var(--radius-lg);
+            padding: 12px 12px 14px; /* Уменьшил padding чтобы компенсировать увеличенную рамку */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .car-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at top right, rgba(255, 75, 75, 0.14), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.25s ease-out;
+            pointer-events: none;
+        }
+
+        .car-card:hover {
+            background: #242424;
+            transform: translateY(-1px);
+        }
+
+        .car-card:hover::before {
+            opacity: 1;
+        }
+
+        .car-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .car-brand {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .car-season {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .car-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            gap: 6px;
+        }
+
+        .car-team {
+            max-width: 60%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .car-flag {
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .car-flag-available {
+            background: rgba(0, 200, 0, 0.15);
+            border-color: rgba(0, 255, 0, 0.4);
+            color: #00ff7b;
+        }
+
+        .car-flag-gold {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: gold;
+            color: gold;
+        }
+
+        .car-flag-sold {
+            background: rgba(225, 6, 0, 0.25);
+            border-color: rgba(225, 6, 0, 0.7);
+            color: #ff8a8a;
+        }
+
+        .car-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .car-description {
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+        }
+
+        .car-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 10px;
+        }
+
+        .car-price {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .car-price span {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        .car-image-wrapper {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+        }
+
+        .car-image {
+            display: block;
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .car-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            color: var(--text-main);
+            font-size: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-outline:hover {
+            border: 1px solid var(--f1-red);
+            background: radial-gradient(circle at top left, rgba(255, 107, 107, 0.1), rgba(225, 6, 0, 0.05) 55%, rgba(139, 27, 61, 0.05));
+            color: var(--f1-red);
+            box-shadow: 0 4px 15px rgba(225, 6, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ---------- Champions section ---------- */
+        .champions-section {
+            margin-top: 32px;
+            padding-top: 4px;
+        }
+
+        .champions-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd666; /* Золотой цвет */
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #ffd666; /* Золотая полоска слева */
+            padding-left: 10px;
+        }
+
+        .champions-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 214, 102, 0.95);
+            background: rgba(255, 214, 102, 0.15);
+            color: #ffd666;
+        }
+
+        .champions-section .car-card {
+            border-color: rgba(255, 214, 102, 0.4);
+        }
+
+        /* Админ кнопки */
+        .btn-admin {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: transparent;
+            color: #ffd666;
+            font-size: 12px;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+
+        .btn-admin:hover {
+            background: rgba(255, 214, 102, 0.12);
+        }
+
+        /* Модальные окна */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-window {
+            background: #141414;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px 20px 16px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #c7c7c7;
+            margin-bottom: 14px;
+        }
+
+        .modal-button {
+            width: 100%;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            background: #e10600;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .modal-button:hover {
+            filter: brightness(1.08);
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .filter-bar {
+                padding: 14px 14px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="logo-circle">
+                <img src="/images/f1-logo.png" alt="F1 Logo">
+            </div>
+            <div>
+                <div class="brand-text-main">AVRAMCHUK BOLID MOTORSPORT</div>
+                <div class="brand-text-sub">
+                    Болиды 1980–2024 • каталог коллекции
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <nav class="nav-links">
+                <a href="/cars" class="nav-link nav-link-active">Каталог</a>
+                <a href="/cart" class="nav-link">Корзина</a>
+                
+
+                <!-- Личный кабинет для авторизованных -->
+                <a href="/profile"
+                class="nav-link"
+                sec:authorize="isAuthenticated()">
+                    Личный кабинет
+                </a>
+                
+                <!-- Кнопки администратора в навигации -->
+                <a th:href="@{/admin/users}"
+                class="nav-link"
+                sec:authorize="hasRole('ADMIN')"
+                style="color: #ffd666;">
+                    Пользователи и заявки
+                </a>
+                
+                <a th:href="@{/admin/cars/new}"
+                class="nav-link"
+                sec:authorize="hasRole('ADMIN')"
+                style="color: #ffd666;">
+                    Добавить болид
+                </a>
+            </nav>
+
+            <!-- Форма выхода - теперь самая правая -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">
+                    Выйти
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Filter -->
+    <section class="filter-bar">
+        <div class="filter-label">Сезон</div>
+
+        <div class="season-tabs">
+            <!-- Все сезоны -->
+            <a th:href="@{/cars(
+                            sort=${sort},
+                            dir=${dir},
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}"
+               th:class="${selectedSeason == null} ? 'season-tab season-tab-active' : 'season-tab'">
+                <span>Все сезоны</span>
+            </a>
+
+            <!-- 2020–2024 -->
+            <a th:each="year : ${#numbers.sequence(2020, 2024)}"
+               th:href="@{/cars(
+                            season=${year},
+                            sort=${sort},
+                            dir=${dir},
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}"
+               th:class="${selectedSeason == year} ? 'season-tab season-tab-active' : 'season-tab'">
+                <span th:text="${year}">2024</span>
+            </a>
+
+            <!-- Кнопка "Чемпионские болиды" -->
+            <a th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort=${sort},
+                            dir=${dir},
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${!championsOnly}
+                        )}"
+               th:class="${championsOnly} ? 'season-tab season-tab-active' : 'season-tab'">
+                <span>Чемпионские болиды</span>
+            </a>
+        </div>
+
+        <!-- Панель сортировки -->
+        <div class="sort-row">
+            <span class="sort-label">Сортировка:</span>
+            <div class="sort-buttons">
+                <!-- Имя -->
+                <a class="season-tab"
+                   th:classappend="${sort == 'name' and dir == 'asc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='name',
+                            dir='asc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Имя ↑
+                </a>
+                <a class="season-tab"
+                   th:classappend="${sort == 'name' and dir == 'desc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='name',
+                            dir='desc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Имя ↓
+                </a>
+
+                <!-- Цена -->
+                <a class="season-tab"
+                   th:classappend="${sort == 'price' and dir == 'asc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='price',
+                            dir='asc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Цена ↑
+                </a>
+                <a class="season-tab"
+                   th:classappend="${sort == 'price' and dir == 'desc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='price',
+                            dir='desc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Цена ↓
+                </a>
+
+                <!-- Год -->
+                <a class="season-tab"
+                   th:classappend="${sort == 'year' and dir == 'asc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='year',
+                            dir='asc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Год ↑
+                </a>
+                <a class="season-tab"
+                   th:classappend="${sort == 'year' and dir == 'desc' ? ' season-tab-active' : ''}"
+                   th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort='year',
+                            dir='desc',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly}
+                        )}">
+                    Год ↓
+                </a>
+            </div>
+        </div>
+
+        <!-- Фильтр по цене и наличию -->
+        <form class="extra-filters" th:action="@{/cars}" method="get">
+            <!-- сохраняем сезон и сортировку при сабмите -->
+            <input type="hidden" name="season" th:value="${selectedSeason}"/>
+            <input type="hidden" name="sort" th:value="${sort}"/>
+            <input type="hidden" name="dir" th:value="${dir}"/>
+            <input type="hidden" name="championsOnly" th:value="${championsOnly}"/>
+
+            <div class="price-filter">
+                <span class="sort-label">Цена, ₽:</span>
+                <input type="number" step="1" min="0" name="minPrice"
+                       th:value="${minPrice}" placeholder="от"/>
+                <input type="number" step="1" min="0" name="maxPrice"
+                       th:value="${maxPrice}" placeholder="до"/>
+            </div>
+
+            <div class="availability-filter">
+                <label>
+                    <input type="checkbox" name="showAvailable"
+                           th:checked="${showAvailable}">
+                    В наличии
+                </label>
+                <label>
+                    <input type="checkbox" name="showUnavailable"
+                           th:checked="${showUnavailable}">
+                    Проданы
+                </label>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">Производитель</div>
+
+                <div class="filter-manufacturers">
+                    <!-- Red Bull Racing -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="1"
+                            th:checked="${teamIds != null && teamIds.contains(1)}">
+                        <span>Red Bull Racing</span>
+                    </label>
+
+                    <!-- Mercedes AMG F1 -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="2"
+                            th:checked="${teamIds != null && teamIds.contains(2)}">
+                        <span>Mercedes AMG F1</span>
+                    </label>
+
+                    <!-- Ferrari -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="3"
+                            th:checked="${teamIds != null && teamIds.contains(3)}">
+                        <span>Ferrari</span>
+                    </label>
+
+                    <!-- Williams -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="4"
+                            th:checked="${teamIds != null && teamIds.contains(4)}">
+                        <span>Williams</span>
+                    </label>
+
+                    <!-- McLaren -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="5"
+                            th:checked="${teamIds != null && teamIds.contains(5)}">
+                        <span>McLaren</span>
+                    </label>
+
+                    <!-- Benetton -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="6"
+                            th:checked="${teamIds != null && teamIds.contains(6)}">
+                        <span>Benetton</span>
+                    </label>
+
+                    <!-- Aston Martin -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="7"
+                            th:checked="${teamIds != null && teamIds.contains(7)}">
+                        <span>Aston Martin</span>
+                    </label>
+
+                    <!-- Alpine -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="8"
+                            th:checked="${teamIds != null && teamIds.contains(8)}">
+                        <span>Alpine</span>
+                    </label>
+
+                    <!-- AlphaTauri -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="9"
+                            th:checked="${teamIds != null && teamIds.contains(9)}">
+                        <span>AlphaTauri</span>
+                    </label>
+
+                    <!-- Visa Cash App RB -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="10"
+                            th:checked="${teamIds != null && teamIds.contains(10)}">
+                        <span>Visa Cash App RB</span>
+                    </label>
+
+                    <!-- Alfa Romeo -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="11"
+                            th:checked="${teamIds != null && teamIds.contains(11)}">
+                        <span>Alfa Romeo</span>
+                    </label>
+
+                    <!-- Stake F1 Team Kick Sauber -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="12"
+                            th:checked="${teamIds != null && teamIds.contains(12)}">
+                        <span>Stake F1 Team</span>
+                    </label>
+
+                    <!-- Haas -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="13"
+                            th:checked="${teamIds != null && teamIds.contains(13)}">
+                        <span>Haas</span>
+                    </label>
+
+                    <!-- Racing Point -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="14"
+                            th:checked="${teamIds != null && teamIds.contains(14)}">
+                        <span>Racing Point</span>
+                    </label>
+
+                    <!-- Renault -->
+                    <label class="filter-chip">
+                        <input type="checkbox" name="teamIds" value="15"
+                            th:checked="${teamIds != null && teamIds.contains(15)}">
+                        <span>Renault</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn-primary" type="submit">Применить фильтр</button>
+            <a th:href="@{/cars}" class="btn-secondary">
+                Сбросить
+            </a>
+        </form>
+    </section>
+
+    <!-- Test Cars Section - только для админов -->
+    <section th:if="${isAdmin}" class="test-cars-section">
+        <div class="cards-section-title" style="color: #ff6b6b; border-left-color: #ff6b6b;">
+            <span>Тестовые болиды</span>
+            <span class="champions-badge" style="border-color: #ff6b6b; background: rgba(255, 107, 107, 0.15); color: #ff6b6b;">
+                Только для админов
+            </span>
+            
+            <!-- Переключатель показа/скрытия тестовых болидов -->
+            <div style="margin-left: auto;">
+                <a th:href="@{/cars(
+                            season=${selectedSeason},
+                            sort=${sort},
+                            dir=${dir},
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice},
+                            showAvailable=${showAvailable},
+                            showUnavailable=${showUnavailable},
+                            championsOnly=${championsOnly},
+                            teamIds=${teamIds},
+                            showHidden=${showHidden != null ? !showHidden : true}
+                        )}"
+                class="season-tab"
+                th:classappend="${showHidden} ? 'season-tab-active' : ''"
+                style="font-size: 12px; padding: 6px 12px;">
+                    <span th:if="${showHidden}">Скрыть тестовые</span>
+                    <span th:if="${!showHidden}">Показать тестовые</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="cars-grid" th:if="${showHidden and not #lists.isEmpty(cars.?[hidden == true])}">
+            <div class="car-card" th:each="car : ${cars.?[hidden == true]}" 
+                style="border: 2px solid rgba(255, 107, 107, 0.4); position: relative;">
+                <!-- Бейдж "Тестовый" -->
+                <div style="position: absolute; top: 10px; right: 10px;">
+                    <span class="car-flag" style="background: rgba(255, 107, 107, 0.2); border-color: #ff6b6b; color: #ff6b6b;">
+                        Тестовый
+                    </span>
+                </div>
+
+                <!-- Картинка болида -->
+                <div class="car-image-wrapper">
+                    <img class="car-image"
+                        th:src="@{|/images/cars/${car.id}.jpg|}"
+                        th:alt="${car.brand}"
+                        src="/images/cars/sample.jpg"
+                        alt="Болид F1">
+                </div>
+
+                <div class="car-header">
+                    <div class="car-brand" th:text="${car.brand}" style="color: #ff6b6b;">
+                        Ferrari SF-23
+                    </div>
+
+                    <div class="car-season" th:text="|${car.seasonYear} сезон|">
+                        2024 сезон
+                    </div>
+                </div>
+
+                <div class="car-meta">
+                    <span class="car-team"
+                        th:text="${car.team != null ? car.team.name : 'Команда не указана'}">
+                        Scuderia Ferrari
+                    </span>
+
+                    <div class="car-flags">
+                        <!-- Флаг чемпионского болида -->
+                        <span th:if="${car.constructorsChampion}"
+                            class="car-flag car-flag-gold">
+                            Чемпион
+                        </span>
+
+                        <!-- Статус наличия -->
+                        <span class="car-flag"
+                            th:classappend="${car.available ? ' car-flag-available' : ''}"
+                            th:text="${car.available ? 'Доступен' : 'Продан'}">
+                            Доступен
+                        </span>
+                    </div>
+                </div>
+
+                <div class="car-stats">
+                    <span th:text="|Побед: ${car.wins}|">Побед: 3</span>
+                    <span th:text="|Очков: ${car.points}|">Очков: 280</span>
+                    <span th:text="|Лучший результат: ${car.bestResult}|">Лучший результат: 1 место</span>
+                    <span th:text="|Пробег: ${car.mileageKm} км|">Пробег: 1200 км</span>
+                </div>
+
+                <p class="car-description"
+                th:text="${car.description}">
+                    Краткое описание болида...
+                </p>
+
+                <div class="car-footer">
+                    <div class="car-price"
+                        th:text="${#numbers.formatDecimal(car.price, 0, 'WHITESPACE', 0, 'NONE') + ' ₽'}">
+                    </div>
+
+                    <div class="car-actions">
+                        <!-- Подробнее -->
+                        <a class="btn-outline"
+                        th:href="@{|/cars/${car.id}|}">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение когда нет тестовых болидов -->
+        <div class="no-results" th:if="${showHidden and #lists.isEmpty(cars.?[hidden == true])}">
+            <h3>Тестовые болиды не найдены</h3>
+            <p>Нет скрытых тестовых болидов в выбранном диапазоне фильтров</p>
+        </div>
+    </section>
+    <!-- Current season section -->
+    <section>
+        <div class="cards-section-title">
+            <span th:if="${selectedSeason != null}"
+                  th:text="|Сезон ${selectedSeason}|">Сезон 2024</span>
+
+            <span th:if="${selectedSeason == null}">
+                Сезоны 2020–2024
+            </span>
+
+            <span class="champions-badge"
+                  th:if="${selectedSeason == null}">
+                Коллекция последних сезонов
+            </span>
+        </div>
+
+        <div class="cars-grid" th:if="${not #lists.isEmpty(cars)}">
+            <div class="car-card" th:each="car : ${cars}">
+                <!-- Картинка болида -->
+                <div class="car-image-wrapper">
+                    <img class="car-image"
+                         th:src="@{|/images/cars/${car.id}.jpg|}"
+                         th:alt="${car.brand}"
+                         src="/images/cars/sample.jpg"
+                         alt="Болид F1">
+                </div>
+
+                <div class="car-header">
+                    <div class="car-brand" th:text="${car.brand}">
+                        Ferrari SF-23
+                    </div>
+
+                    <div class="car-season" th:text="|${car.seasonYear} сезон|">
+                        2024 сезон
+                    </div>
+                </div>
+
+                <div class="car-meta">
+                    <span class="car-team"
+                          th:text="${car.team != null ? car.team.name : 'Команда не указана'}">
+                        Scuderia Ferrari
+                    </span>
+
+                    <div class="car-flags">
+                        <!-- Флаг чемпионского болида -->
+                        <span th:if="${car.constructorsChampion}"
+                              class="car-flag car-flag-gold">
+                            Чемпион
+                        </span>
+
+                        <!-- Статус наличия -->
+                        <span class="car-flag"
+                              th:classappend="${car.available ? ' car-flag-available' : ''}"
+                              th:text="${car.available ? 'Доступен' : 'Продан'}">
+                            Доступен
+                        </span>
+                    </div>
+                </div>
+
+                <div class="car-stats">
+                    <span th:text="|Побед: ${car.wins}|">Побед: 3</span>
+                    <span th:text="|Очков: ${car.points}|">Очков: 280</span>
+                    <span th:text="|Лучший результат: ${car.bestResult}|">Лучший результат: 1 место</span>
+                    <span th:text="|Пробег: ${car.mileageKm} км|">Пробег: 1200 км</span>
+                </div>
+
+                <p class="car-description"
+                   th:text="${car.description}">
+                    Краткое описание болида...
+                </p>
+
+                <div class="car-footer">
+                    <div class="car-price"
+                         th:text="${#numbers.formatDecimal(car.price, 0, 'WHITESPACE', 0, 'NONE') + ' ₽'}">
+                    </div>
+
+                    <div class="car-actions">
+                        <!-- Подробнее -->
+                        <a class="btn-outline"
+                           th:href="@{|/cars/${car.id}|}">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение когда нет современных болидов -->
+        <div class="no-results" th:if="${#lists.isEmpty(cars)}">
+            <h3>Болиды не найдены</h3>
+            <p>В выбранном диапазоне фильтров нет доступных болидов</p>
+        </div>
+    </section>
+
+    <!-- Champions section -->
+    <section id="champions" class="champions-section">
+        <div class="champions-title">
+            Чемпионские болиды 1980–1999
+            <span class="champions-badge">Конструкторские титулы</span>
+        </div>
+
+        <div class="cars-grid" th:if="${championCars != null and not #lists.isEmpty(championCars)}">
+            <div class="car-card" th:each="car : ${championCars}">
+                <!-- Картинка чемпионского болида -->
+                <div class="car-image-wrapper">
+                    <img class="car-image"
+                         th:src="@{|/images/cars/${car.id}.jpg|}"
+                         th:alt="${car.brand}"
+                         src="/images/cars/sample.jpg"
+                         alt="Болид F1">
+                </div>
+
+                <div class="car-header">
+                    <div class="car-brand" th:text="${car.brand}">
+                        McLaren MP4/4
+                    </div>
+
+                    <div class="car-season" th:text="|${car.seasonYear} сезон|">
+                        1988 сезон
+                    </div>
+                </div>
+
+                <div class="car-meta">
+                    <span class="car-team"
+                          th:text="${car.team != null ? car.team.name : 'Команда не указана'}">
+                        McLaren
+                    </span>
+
+                    <div class="car-flags">
+                        <span th:if="${car.constructorsChampion}"
+                              class="car-flag car-flag-gold">
+                            Чемпион
+                        </span>
+
+                        <span class="car-flag"
+                              th:classappend="${car.available ? ' car-flag-available' : ''}"
+                              th:text="${car.available ? 'Доступен' : 'Продан'}">
+                            Доступен
+                        </span>
+                    </div>
+                </div>
+
+                <div class="car-stats">
+                    <span th:text="|Побед: ${car.wins}|">Побед: 15</span>
+                    <span th:text="|Очков: ${car.points}|">Очков: 199</span>
+                    <span th:text="|Лучший результат: ${car.bestResult}|">Лучший результат: 1 место</span>
+                    <span th:text="|Пробег: ${car.mileageKm} км|">Пробег: 800 км</span>
+                </div>
+
+                <p class="car-description"
+                   th:text="${car.description}">
+                    Легендарный чемпионский болид...
+                </p>
+
+                <div class="car-footer">
+                    <div class="car-price"
+                         th:text="${#numbers.formatDecimal(car.price, 0, 'WHITESPACE', 0, 'NONE') + ' ₽'}">
+                    </div>
+
+                    <div class="car-actions">
+                        <!-- Подробнее -->
+                        <a class="btn-outline"
+                           th:href="@{|/cars/${car.id}|}">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сообщение когда нет чемпионских болидов -->
+        <div class="no-results" th:if="${championCars == null or #lists.isEmpty(championCars)}">
+            <h3>Чемпионские болиды не найдены</h3>
+            <p>В выбранном диапазоне фильтров нет доступных чемпионских болидов</p>
+        </div>
+    </section>
+
+</div>
+
+<div th:if="${successMessage}" id="order-modal" class="modal-backdrop">
+    <div class="modal-window">
+        <div class="modal-title">Информативное сообщение</div>
+        <div class="modal-text" th:text="${successMessage}">
+            Ваша заявка успешно отправлена. Мы свяжемся с вами.
+        </div>
+        <button type="button" class="modal-button" onclick="closeOrderModal()">
+            Закрыть
+        </button>
+    </div>
+</div>
+
+<script>
+    function closeOrderModal() {
+        const el = document.getElementById('order-modal');
+        if (el) {
+            el.style.display = 'none';
+        }
+    }
+
+    // Сохраняем состояние чекбоксов при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        // Получаем все чекбоксы производителей
+        const teamCheckboxes = document.querySelectorAll('input[name="teamIds"]');
+        
+        // Восстанавливаем состояние из URL параметров
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTeams = urlParams.getAll('teamIds');
+        
+        teamCheckboxes.forEach(checkbox => {
+            if (selectedTeams.includes(checkbox.value)) {
+                checkbox.checked = true;
+            }
+        });
+    });
+
+    // Валидация ценового диапазона
+    document.addEventListener('DOMContentLoaded', function() {
+        const minPriceInput = document.querySelector('input[name="minPrice"]');
+        const maxPriceInput = document.querySelector('input[name="maxPrice"]');
+        const filterForm = document.querySelector('.extra-filters');
+
+        function validatePriceRange() {
+            const minPrice = parseInt(minPriceInput.value) || 0;
+            const maxPrice = parseInt(maxPriceInput.value) || 0;
+
+            if (minPrice > maxPrice && maxPrice > 0) {
+                // Меняем местами значения
+                [minPriceInput.value, maxPriceInput.value] = [maxPrice, minPrice];
+                
+                // Показываем уведомление
+                showPriceAlert('Цены были автоматически исправлены');
+            }
+        }
+
+        function showPriceAlert(message) {
+            // Удаляем предыдущее уведомление если есть
+            const existingAlert = document.querySelector('.price-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Создаем новое уведомление
+            const alert = document.createElement('div');
+            alert.className = 'price-alert';
+            alert.textContent = message;
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--f1-red);
+                color: white;
+                padding: 10px 16px;
+                border-radius: 8px;
+                font-size: 12px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+
+            document.body.appendChild(alert);
+
+            // Удаляем через 3 секунды
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Слушаем изменения в полях цены
+        if (minPriceInput && maxPriceInput) {
+            minPriceInput.addEventListener('change', validatePriceRange);
+            maxPriceInput.addEventListener('change', validatePriceRange);
+
+            // Также валидация при отправке формы
+            filterForm.addEventListener('submit', function(e) {
+                const minPrice = parseInt(minPriceInput.value) || 0;
+                const maxPrice = parseInt(maxPriceInput.value) || 0;
+
+                if (minPrice > maxPrice && maxPrice > 0) {
+                    e.preventDefault();
+                    showPriceAlert('Минимальная цена не может быть больше максимальной');
+                    minPriceInput.focus();
+                }
+            });
+
+            // Анимация для уведомления
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    });
+</script>
+
+</body>
+</html>
